@@ -15,7 +15,7 @@ import (
 	"errors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/helioLJ/tweetvault/internal/models"
+	"github.com/Microck/chudvault/internal/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

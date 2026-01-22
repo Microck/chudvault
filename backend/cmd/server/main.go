@@ -4,11 +4,11 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/helioLJ/tweetvault/config"
-	"github.com/helioLJ/tweetvault/internal/api/routes"
-	"github.com/helioLJ/tweetvault/internal/database"
-	"github.com/helioLJ/tweetvault/internal/jobs"
-	"github.com/helioLJ/tweetvault/internal/services"
+	"github.com/Microck/chudvault/config"
+	"github.com/Microck/chudvault/internal/api/routes"
+	"github.com/Microck/chudvault/internal/database"
+	"github.com/Microck/chudvault/internal/jobs"
+	"github.com/Microck/chudvault/internal/services"
 )
 
 func main() {

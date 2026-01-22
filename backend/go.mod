@@ -1,4 +1,4 @@
-module github.com/helioLJ/tweetvault
+module github.com/Microck/chudvault
 
 go 1.23.6
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/helioLJ/tweetvault/config"
-	"github.com/helioLJ/tweetvault/internal/models"
+	"github.com/Microck/chudvault/config"
+	"github.com/Microck/chudvault/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

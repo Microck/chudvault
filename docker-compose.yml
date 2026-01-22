@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:15
-    container_name: tweetvault_db
+    container_name: chudvault_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: tweetvault
+      POSTGRES_DB: chudvault
     ports:
       - "5432:5432"
     volumes:
@@ -20,13 +20,13 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    container_name: tweetvault_api
+    container_name: chudvault_api
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      DB_NAME: tweetvault
+      DB_NAME: chudvault
       SERVER_PORT: 8080
     ports:
       - "8080:8080"
@@ -40,7 +40,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: tweetvault_web
+    container_name: chudvault_web
     ports:
       - "3000:3000"
     volumes:

@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/helioLJ/tweetvault/internal/services"
+	"github.com/Microck/chudvault/internal/services"
 )
 
 func StartViewRefreshJob(bookmarkService *services.BookmarkService) {

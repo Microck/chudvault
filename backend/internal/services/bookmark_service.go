@@ -6,7 +6,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/helioLJ/tweetvault/internal/models"
+	"github.com/Microck/chudvault/internal/models"
 	"gorm.io/gorm"
 )
 

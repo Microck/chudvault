@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/helioLJ/tweetvault/internal/api/handlers"
+	"github.com/Microck/chudvault/internal/api/handlers"
 	"gorm.io/gorm"
 )
 

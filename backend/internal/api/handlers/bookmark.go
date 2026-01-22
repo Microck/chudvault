@@ -6,8 +6,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/helioLJ/tweetvault/internal/models"
-	"github.com/helioLJ/tweetvault/internal/services"
+	"github.com/Microck/chudvault/internal/models"
+	"github.com/Microck/chudvault/internal/services"
 	"gorm.io/gorm"
 )
 
