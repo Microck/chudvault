@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./docs/assets/logo.svg" width="100" alt="chudvault logo" />
+  <img src="https://github.com/user-attachments/assets/50fad90d-334a-43e1-a0f5-a8a8ae7d7c98" width="200" alt="chudvault logo" />
 </p>
 
 <p align="center">
@@ -12,18 +12,6 @@
   <img src="https://img.shields.io/badge/next.js-15-black" />
   <img src="https://img.shields.io/badge/go-1.18%2B-black" />
 </p>
-
-<p align="center">
-  <img src="./docs/assets/preview.png" width="800" alt="chudvault preview" />
-</p>
-
-## demo
-
-![chudvault demo part 1](./docs/assets/part1.gif)
-
-![chudvault demo part 2](./docs/assets/part2.gif)
-
----
 
 
 ---
@@ -114,9 +102,5 @@ docs/
 
 mit
 
----
-
-## inspiration
-
-inspired by [TweetVault](https://github.com/helioLJ/TweetVault) by helioLJ.
+![G-GHDx-WYAAK5L_](https://github.com/user-attachments/assets/e6046790-3229-4bfb-9a07-e4776dbfe591)
 
