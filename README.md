@@ -41,7 +41,7 @@ backend: http://localhost:8080
 - **search & filter**: instant search and tag filtering
 - **batch operations**: select multiple bookmarks to delete or archive
 - **statistics dashboard**: visualize your bookmark habits and top tags
-- **data import**: simple drag-and-drop upload for twitter export zips
+- **data import**: simple drag-and-drop upload for twitter export zips (use [Twitter Web Exporter](https://github.com/prinsss/twitter-web-exporter))
 - **markdown export**: export your curated collection to markdown
 - **auto-categorization**: automatic badges for github, youtube, articles, etc.
 
@@ -50,7 +50,7 @@ backend: http://localhost:8080
 
 ## how it works
 
-1. upload twitter export json + zip
+1. export bookmarks using [Twitter Web Exporter](https://github.com/prinsss/twitter-web-exporter) (json + zip)
 2. backend parses and stores in postgres
 3. frontend renders cards, tags, stats, and filters
 4. export generates markdown from current data
@@ -77,7 +77,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
-DB_NAME=tweetvault
+DB_NAME=chudvault
 SERVER_PORT=8080
 ```
 
