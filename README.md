@@ -32,15 +32,19 @@ backend: http://localhost:8080
 
 ## features
 
-- view bookmarks with full text, media, and stats
-- tag, rename, and delete custom tags
-- fixed tags: "to do", "to read" with completion toggle
-- search and filter by tag
-- batch select and delete or archive
-- stats dashboard for counts and top tags
-- import twitter exports (json + zip)
-- markdown export of all bookmarks
-- category badges from url pattern
+- **modern ui/ux**: rebuilt with shadcn/ui, tailwind css, and animations for a premium feel
+- **bookmark management**: view detailed bookmarks with full text, clickable links, images, and media
+- **tagging system**: 
+  - create, rename, and delete custom tags
+  - fixed standard tags ("to do", "to read")
+  - toggle completion status
+- **search & filter**: instant search and tag filtering
+- **batch operations**: select multiple bookmarks to delete or archive
+- **statistics dashboard**: visualize your bookmark habits and top tags
+- **data import**: simple drag-and-drop upload for twitter export zips
+- **markdown export**: export your curated collection to markdown
+- **auto-categorization**: automatic badges for github, youtube, articles, etc.
+
 
 ---
 
