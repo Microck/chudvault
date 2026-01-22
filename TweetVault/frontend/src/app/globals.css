@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #eff5f6;
+    --foreground: #131f20;
+    --card-bg: #ffffff;
+    --card-border: #bfd7d9;
+    --muted: #e2e8e9;
+    --muted-foreground: #577075;
+    --primary: #08dff7;
+    --primary-foreground: #011f23;
+    --secondary: #29c2d6;
+    --secondary-foreground: #061b1e;
+    --accent: #5e9aa1;
+    --accent-foreground: #eff5f6;
+    --destructive: #ef4444;
+    --destructive-foreground: #f8fafc;
+    --border: #bfd7d9;
+    --input: #bfd7d9;
+    --ring: #08dff7;
+  }
+
+  .dark {
+    --background: #0d1616;
+    --foreground: #eff5f6;
+    --card-bg: #131f20;
+    --card-border: #263e40;
+    --muted: #161c1d;
+    --muted-foreground: #a7babe;
+    --primary: #08dff7;
+    --primary-foreground: #011f23;
+    --secondary: #29c2d6;
+    --secondary-foreground: #061b1e;
+    --accent: #5e9aa1;
+    --accent-foreground: #eff5f6;
+    --destructive: #7f1d1d;
+    --destructive-foreground: #f8fafc;
+    --border: #263e40;
+    --input: #263e40;
+    --ring: #06b3c6;
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  font-family: var(--font-plus-jakarta), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+.dark .bg-white {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--muted);
+}
+
+.dark .text-gray-500 {
+  color: var(--muted-foreground);
+}
+
+.dark .text-gray-600 {
+  color: var(--muted-foreground);
+}
+
+.dark .text-gray-900 {
+  color: var(--foreground);
+}
+
+.dark .border {
+  border-color: var(--card-border);
+}
+
+.dark .border-gray-300 {
+  border-color: var(--card-border);
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: var(--muted);
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: var(--muted);
+}
+
+.dark .bg-gray-100 {
+  background-color: var(--muted);
+}
+
+.dark .bg-gray-200 {
+  background-color: #334155;
+}
+
+.dark .text-gray-700 {
+  color: var(--foreground);
+}
+
+.dark .text-gray-800 {
+  color: var(--card-bg);
+}
+
+.dark .border-gray-700 {
+  border-color: var(--card-border);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+* {
+  @apply transition-colors duration-200;
+}
+
+*:focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2;
+}
