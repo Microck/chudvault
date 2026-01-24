@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Settings, Upload, FileText, Check, Square, Trash2 } from 'lucide-react';
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
+import { AISettingsModal } from '@/components/bookmarks/AISettingsModal';
 
 export default function Home() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
@@ -297,6 +298,7 @@ export default function Home() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ThemeToggle />
+          <AISettingsModal />
           <Button
             variant={showArchived ? "default" : "secondary"}
             onClick={() => setShowArchived(!showArchived)}

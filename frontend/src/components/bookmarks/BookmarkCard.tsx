@@ -29,6 +29,8 @@ interface BookmarkCardProps {
   isArchived: boolean;
 }
 
+import { AutoTagButton } from './AutoTagButton';
+
 export function BookmarkCard({ 
   bookmark,
   onUpdateTags, 
@@ -313,62 +315,68 @@ export function BookmarkCard({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          {localTags.map((tag) => {
-            const isSpecial = specialTags.includes(tag.name);
-            return (
-              <Badge 
-                key={tag.uniqueId} 
-                variant={isSpecial ? "default" : "secondary"}
-                className={`flex items-center gap-1 pr-1 cursor-default ${
-                  isSpecial ? 'bg-accent text-accent-foreground hover:bg-accent/90' : ''
-                }`}
-              >
-                {isSpecial && (
-                  <Checkbox 
-                    checked={tag.completed} 
-                    onCheckedChange={() => handleToggleCompletion(tag.name)}
-                    className="h-3 w-3 border-current data-[state=checked]:bg-current data-[state=checked]:text-background mr-1"
-                  />
-                )}
-                {tag.name}
-                <button
-                  onClick={() => handleRemoveTag(tag.name)}
-                  className="ml-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
+          <div className="flex flex-wrap gap-2 items-center">
+            {localTags.map((tag) => {
+              const isSpecial = specialTags.includes(tag.name);
+              return (
+                <Badge 
+                  key={tag.uniqueId} 
+                  variant={isSpecial ? "default" : "secondary"}
+                  className={`flex items-center gap-1 pr-1 cursor-default ${
+                    isSpecial ? 'bg-accent text-accent-foreground hover:bg-accent/90' : ''
+                  }`}
                 >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            );
-          })}
-          
-          <div className="relative flex items-center">
-            <input
-              type="text"
-              placeholder="+ Tag"
-              className="text-xs bg-transparent border border-input rounded-full px-2 py-1 w-16 focus:w-24 focus:outline-none focus:border-primary transition-all placeholder:text-muted-foreground"
-              value={newTag}
-              onChange={(e) => {
-                setNewTag(e.target.value);
-                updateSuggestedTags(e.target.value);
-              }}
-              onKeyDown={handleAddTag}
-            />
-            {suggestedTags.length > 0 && (
-              <div className="absolute left-0 top-full mt-1 w-32 bg-popover border border-border rounded-md shadow-md z-50 overflow-hidden">
-                {suggestedTags.map(tag => (
+                  {isSpecial && (
+                    <Checkbox 
+                      checked={tag.completed} 
+                      onCheckedChange={() => handleToggleCompletion(tag.name)}
+                      className="h-3 w-3 border-current data-[state=checked]:bg-current data-[state=checked]:text-background mr-1"
+                    />
+                  )}
+                  {tag.name}
                   <button
-                    key={tag.id}
-                    className="w-full text-left px-2 py-1.5 text-xs hover:bg-accent hover:text-accent-foreground transition-colors"
-                    onClick={() => handleSuggestedTagClick(tag)}
+                    onClick={() => handleRemoveTag(tag.name)}
+                    className="ml-1 hover:bg-black/10 dark:hover:bg-white/10 rounded-full p-0.5 transition-colors"
                   >
-                    {tag.name}
+                    <X className="h-3 w-3" />
                   </button>
-                ))}
-              </div>
-            )}
+                </Badge>
+              );
+            })}
+            
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                placeholder="+ Tag"
+                className="text-xs bg-transparent border border-input rounded-full px-2 py-1 w-16 focus:w-24 focus:outline-none focus:border-primary transition-all placeholder:text-muted-foreground"
+                value={newTag}
+                onChange={(e) => {
+                  setNewTag(e.target.value);
+                  updateSuggestedTags(e.target.value);
+                }}
+                onKeyDown={handleAddTag}
+              />
+              {suggestedTags.length > 0 && (
+                <div className="absolute left-0 top-full mt-1 w-32 bg-popover border border-border rounded-md shadow-md z-50 overflow-hidden">
+                  {suggestedTags.map(tag => (
+                    <button
+                      key={tag.id}
+                      className="w-full text-left px-2 py-1.5 text-xs hover:bg-accent hover:text-accent-foreground transition-colors"
+                      onClick={() => handleSuggestedTagClick(tag)}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <AutoTagButton 
+              bookmarkId={bookmark.id} 
+              text={bookmark.full_text}
+              onTagsUpdated={() => eventBus.emit("tagUpdated", undefined)}
+            />
           </div>
-        </div>
       </CardContent>
 
       <CardFooter className="p-4 pt-0 text-xs text-muted-foreground border-t border-border/50 mt-auto pt-3 flex justify-between items-center bg-muted/20">
