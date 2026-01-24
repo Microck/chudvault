@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Bookmark, Tag } from '@/types';
 import Image from 'next/image';
 import { FormattedDate } from './FormattedDate';
@@ -55,16 +55,7 @@ export function BookmarkCard({
     }));
   });
 
-  const extractDomain = (url: string): string => {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname.replace('www.', '');
-    } catch {
-      return url;
-    }
-  };
 
-  const linkDomain = extractDomain(bookmark.url);
   const specialTags = ['To do', 'To read'];
 
   const detectCategory = (bookmark: Bookmark): Bookmark['category'] => {
@@ -78,9 +69,9 @@ export function BookmarkCard({
     return 'tweet';
   };
 
-  const category = detectCategory(bookmark);
+  const category = detectCategory(bookmark) ?? 'tweet';
 
-  const categoryColors: Record<Bookmark['category'], string> = {
+  const categoryColors: Record<NonNullable<Bookmark['category']>, string> = {
     article: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
     github: 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border-blue-200 dark:border-blue-800',
     tweet: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300 border-sky-200 dark:border-sky-800',

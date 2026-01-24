@@ -1,26 +1,21 @@
-# Handover
+# Handoff
 
 ## Goal
-Rework the UI using the requested Teal/Cyan palette, Shadcn components (via Registry MCP), and add animations (Anime.js).
+Run the frontend and verify it works.
 
-## Progress
-- **Palette**: Restored strict color palette in `globals.css` and `tailwind.config.ts`.
-- **Components**:
-  - Replaced custom `Button` with Shadcn `Button`.
-  - Added Shadcn `Card`, `Badge`, `Input`, `Select`, `Dialog`, `DropdownMenu`, `Checkbox`.
-  - Refactored `BookmarkCard`, `Pagination`, `SearchAndFilter`, `UploadModal` to use these components.
-- **Animations**:
-  - Installed `animejs`.
-  - Added stagger entrance animation for bookmark cards in `page.tsx`.
-- **Verification**:
-  - Used `lightpanda_take_screenshot` to verify the UI loads with correct fonts (Geist) and styling.
+## Status
+- Frontend running on http://localhost:3039.
+- **Data Persistence**: Local file storage (`frontend/data/db.json`).
+- **Heatmap**: 
+  - Shows full year (371 blocks).
+  - **Verified data rendering**: 68 filled blocks found in the heatmap (indicating bookmarks are present and visualized).
+  - Debug console log added for further inspection.
+- **Auto-tagging**: Disabled.
 
-## What Worked
-- Docker container rebuilt successfully with new dependencies (`lucide-react`, `animejs`, `tailwindcss-animate`).
-- Lightpanda confirmed the visual layout is correct.
+## Verification
+- Page loads successfully.
+- Heatmap visualizes data (not just empty blocks).
+- "No bookmarks found" is GONE (implied by filled blocks).
 
 ## Next Steps
-- Add more widgets or charts to the "Statistics" section if needed.
-- Backend currently returns 0 bookmarks; verify with real data.
-
-Please start a new session.
+- Verify bookmark upload manually if adding *new* data.

@@ -4,7 +4,7 @@ import { Tag } from '@/types';
 import { TagMenu } from './TagMenu';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, X, Plus } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface SearchAndFilterProps {
@@ -23,7 +23,6 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
     const [tags, setTags] = useState<Tag[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [newTagInput, setNewTagInput] = useState('');
-    const [suggestedTags, setSuggestedTags] = useState<Tag[]>([]);
 
     useImperativeHandle(ref, () => ({
       loadTags
@@ -48,20 +47,6 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
       onSearch(value);
     };
 
-    const updateSuggestedTags = (input: string) => {
-      if (!input.trim()) {
-        setSuggestedTags([]);
-        return;
-      }
-      
-      // Use a case-insensitive search
-      const searchTerm = input.toLowerCase();
-      const filtered = tags.filter(tag => 
-        tag.name.toLowerCase().includes(searchTerm)
-      );
-      setSuggestedTags(filtered);
-    };
-
     const handleAddTag = async (tagName: string) => {
       if (!tagName.trim()) return;
       
@@ -70,7 +55,6 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
         if (tags.some(t => t.name.toLowerCase() === tagName.toLowerCase())) {
           onTagSelect(tagName);
           setNewTagInput('');
-          setSuggestedTags([]);
           return;
         }
 
@@ -79,7 +63,6 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
         await loadTags(); // Reload tags after creating
         
         setNewTagInput('');
-        setSuggestedTags([]);
       } catch (error) {
         console.error('Failed to add tag:', error);
       }
@@ -145,7 +128,6 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
                 onChange={(e) => {
                   const value = e.target.value;
                   setNewTagInput(value);
-                  updateSuggestedTags(value);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && newTagInput.trim()) {
@@ -160,3 +142,5 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
     );
   }
 );
+
+SearchAndFilter.displayName = 'SearchAndFilter';

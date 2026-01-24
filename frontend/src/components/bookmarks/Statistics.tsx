@@ -1,14 +1,20 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { api } from '@/lib/api';
 import { eventBus } from '@/lib/eventBus';
+import { ActivityHeatmap } from './ActivityHeatmap';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bookmark, Archive, Tag, CheckSquare, ListTodo, Hash } from 'lucide-react';
+import { Bookmark, Archive, CheckSquare, ListTodo, Hash, Calendar } from 'lucide-react';
 
 export interface StatisticsRef {
   refresh: () => void;
 }
 
-export const Statistics = forwardRef<StatisticsRef>((_, ref) => {
+interface StatisticsProps {
+  onDateSelect?: (date: string | undefined) => void;
+  selectedDate?: string;
+}
+
+export const Statistics = forwardRef<StatisticsRef, StatisticsProps>(({ onDateSelect, selectedDate }, ref) => {
   const [stats, setStats] = useState<{
     total_bookmarks: number;
     active_bookmarks: number;
@@ -18,6 +24,11 @@ export const Statistics = forwardRef<StatisticsRef>((_, ref) => {
       name: string; 
       count: number;
       completed_count: number; 
+    }>;
+    heatmap: Array<{
+      date: string;
+      count: number;
+      level: number;
     }>;
   } | null>(null);
 
@@ -123,6 +134,20 @@ export const Statistics = forwardRef<StatisticsRef>((_, ref) => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-7">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Activity</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <ActivityHeatmap 
+              data={stats.heatmap} 
+              onDateSelect={onDateSelect}
+              selectedDate={selectedDate}
+            />
+          </CardContent>
+        </Card>
+
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Popular Tags</CardTitle>

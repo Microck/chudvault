@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Bookmark } from '@/types';
 import { api } from '@/lib/api';
 import { BookmarkCard } from '@/components/bookmarks/BookmarkCard';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/Pagination';
 import { UploadModal } from '@/components/bookmarks/UploadModal';
@@ -13,13 +14,14 @@ import { Statistics } from '@/components/bookmarks/Statistics';
 import { StatisticsRef } from '@/components/bookmarks/Statistics';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Settings, Upload, FileText, Check, Square } from 'lucide-react';
+import { Settings, Upload, FileText, Check, Square, Trash2 } from 'lucide-react';
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
 
 export default function Home() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [selectedTag, setSelectedTag] = useState<string>();
+  const [selectedDate, setSelectedDate] = useState<string>();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(() => {
@@ -35,6 +37,7 @@ export default function Home() {
   const [selectedBookmarks, setSelectedBookmarks] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const reloadTags = useRef<() => void>(() => {});
@@ -42,11 +45,7 @@ export default function Home() {
   const mainRef = useRef<HTMLElement>(null);
   const scrollPositionRef = useRef<number>(0);
 
-  useEffect(() => {
-    loadBookmarks();
-  }, [currentPage, selectedTag, searchQuery, showArchived, pageSize]);
-
-  async function loadBookmarks() {
+  const loadBookmarks = useCallback(async () => {
     setIsLoading(true);
     scrollPositionRef.current = window.scrollY;
 
@@ -57,6 +56,7 @@ export default function Home() {
         page: currentPage,
         limit: pageSize,
         archived: showArchived,
+        date: selectedDate,
       });
 
       setBookmarks(data.bookmarks || []);
@@ -69,7 +69,11 @@ export default function Home() {
       setBookmarks([]);
     }
     setIsLoading(false);
-  }
+  }, [selectedTag, searchQuery, currentPage, pageSize, showArchived, selectedDate]);
+
+  useEffect(() => {
+    loadBookmarks();
+  }, [loadBookmarks]);
 
   async function handleUpdateTags(id: string, tags: string[]) {
     try {
@@ -107,12 +111,35 @@ export default function Home() {
     }
   }
 
+  async function handleClearAll() {
+    try {
+      await api.clearAll();
+      setSelectedTag(undefined);
+      setSelectedDate(undefined);
+      setSearchQuery('');
+      setCurrentPage(1);
+      setSelectedBookmarks(new Set());
+      setIsSelectMode(false);
+      setIsClearModalOpen(false);
+      reloadTags.current();
+      statisticsRef.current?.refresh();
+      await loadBookmarks();
+    } catch (error) {
+      console.error('Failed to clear all data:', error);
+    }
+  }
+
   function handleSearch(query: string) {
     setSearchQuery(query);
   }
 
   function handleTagSelect(tag: string | undefined) {
     setSelectedTag(tag);
+    setCurrentPage(1);
+  }
+
+  function handleDateSelect(date: string | undefined) {
+    setSelectedDate(date);
     setCurrentPage(1);
   }
 
@@ -265,7 +292,7 @@ export default function Home() {
       <main ref={mainRef} className="container relative z-10 mx-auto px-6 py-12 max-w-7xl">
         <div className="mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
-          <img src="/logo.svg" alt="chudvault" className="h-10 w-10" />
+          <Image src="/logo.svg" alt="chudvault" width={40} height={40} className="h-10 w-10" />
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">chudvault</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -296,6 +323,13 @@ export default function Home() {
           >
             <FileText className="mr-2 h-4 w-4" />
             Export
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => setIsClearModalOpen(true)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Reset
           </Button>
           <Button
             variant="ghost"
@@ -346,7 +380,11 @@ export default function Home() {
       )}
 
       <div className="mb-8">
-        <Statistics ref={statisticsRef} />
+        <Statistics 
+          ref={statisticsRef}
+          onDateSelect={handleDateSelect}
+          selectedDate={selectedDate}
+        />
       </div>
 
       <div className="mb-8">
@@ -441,6 +479,25 @@ export default function Home() {
               </Button>
               <Button variant="destructive" onClick={handleDeleteSelected}>
                 Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isClearModalOpen && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-destructive/10 border-destructive/20 border rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold mb-3 text-destructive-foreground">Reset ChudVault</h3>
+            <p className="mb-6 text-muted-foreground">
+              This will permanently delete all bookmarks and tags from your local storage (data/db.json).
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" onClick={() => setIsClearModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleClearAll}>
+                Reset
               </Button>
             </div>
           </div>

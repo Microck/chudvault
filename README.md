@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  full-stack app to manage, tag, search, and archive twitter bookmarks.
+  full-stack app to manage, tag, search, and archive twitter bookmarks. now supports local-only mode.
 </p>
 
 <p align="center">
@@ -14,9 +14,27 @@
 </p>
 
 
+ <p align="center">
+   <img src="./docs/assets/preview.png" width="800" alt="chudvault preview" />
+ </p>
+
 ---
 
 ## quickstart
+
+local-only:
+
+```bash
+git clone https://github.com/Microck/chudvault.git
+cd chudvault/frontend
+npm install
+# no env file needed for file-system storage default
+npm run dev
+```
+
+open: http://localhost:3000
+
+full stack:
 
 ```bash
 git clone https://github.com/Microck/chudvault.git
@@ -27,37 +45,54 @@ docker compose up --build
 frontend: http://localhost:3000
 backend: http://localhost:8080
 
-
 ---
 
 ## features
 
-- **modern ui/ux**: rebuilt with shadcn/ui, tailwind css, and animations for a premium feel
-- **bookmark management**: view detailed bookmarks with full text, clickable links, images, and media
-- **tagging system**: 
-  - create, rename, and delete custom tags
-  - fixed standard tags ("to do", "to read")
-  - toggle completion status
-- **search & filter**: instant search and tag filtering
-- **batch operations**: select multiple bookmarks to delete or archive
-- **statistics dashboard**: visualize your bookmark habits and top tags
-- **data import**: simple drag-and-drop upload for twitter export zips (use [Twitter Web Exporter](https://github.com/prinsss/twitter-web-exporter))
-- **markdown export**: export your curated collection to markdown
-- **auto-categorization**: automatic badges for github, youtube, articles, etc.
-
+- modern ui/ux with shadcn/ui and tailwind
+- **local file storage**: data saved to `frontend/data/db.json` - fully private
+- bookmark cards with full text and media
+- tags: create, rename, delete, and mark complete
+- search and filter by text or tag
+- batch select delete and archive
+- stats panel with **activity heatmap**
+- import twitter export json + zip
+- export current bookmarks
+- auto-categorize by url
 
 ---
 
 ## how it works
 
-1. export bookmarks using [Twitter Web Exporter](https://github.com/prinsss/twitter-web-exporter) (json + zip)
-2. backend parses and stores in postgres
-3. frontend renders cards, tags, stats, and filters
-4. export generates markdown from current data
+```mermaid
+flowchart td
+  a[export twitter bookmarks json + zip] --> b[upload in ui]
+  b --> c{local mode?}
+  c -->|yes| d[local api writes to data/db.json]
+  c -->|no| e[backend parses and stores in postgres]
+  d --> f[frontend renders cards, tags, stats]
+  e --> f
+```
+
+1. export bookmarks using [Twitter Web Exporter](https://github.com/prinsss/twitter-web-exporter)
+2. upload json + zip in the ui
+3. local mode stores data in `frontend/data/db.json`
+4. full stack mode stores data in postgres
+5. export generates a file from current data
 
 ---
 
 ## usage
+
+frontend only:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+full stack:
 
 ```bash
 cd frontend
@@ -71,7 +106,8 @@ go mod tidy
 go run cmd/server/main.go
 ```
 
-env:
+backend env:
+
 ```
 DB_HOST=localhost
 DB_PORT=5432
@@ -93,14 +129,14 @@ backend/
 frontend/
   src/app/
   src/components/
+  data/          <-- Local storage location
 docs/
 ```
 
 ---
 
-## license
+ ## license
+ 
+ mit
 
-mit
-
-![G-GHDx-WYAAK5L_](https://github.com/user-attachments/assets/e6046790-3229-4bfb-9a07-e4776dbfe591)
-
+ ![G-GHDx-WYAAK5L_](https://github.com/user-attachments/assets/e6046790-3229-4bfb-9a07-e4776dbfe591)

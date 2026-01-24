@@ -37,24 +37,6 @@ export const metadata: Metadata = {
     description: "Organize and manage your Twitter bookmarks with chudvault",
     creator: "@chudvault",
   },
-  description: "Organize and manage your Twitter bookmarks with ChudVault. Search, tag, and archive your favorite tweets.",
-  keywords: ["Twitter", "Bookmarks", "Archive", "Social Media", "Organization"],
-  authors: [{ name: "ChudVault" }],
-  creator: "ChudVault",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://chudvault.app",
-    title: "ChudVault - Your Twitter Bookmarks Archive",
-    description: "Organize and manage your Twitter bookmarks with ChudVault. Search, tag, and archive your favorite tweets.",
-    siteName: "ChudVault",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ChudVault - Your Twitter Bookmarks Archive",
-    description: "Organize and manage your Twitter bookmarks with ChudVault",
-    creator: "@chudvault",
-  },
   icons: {
     icon: [
       {
