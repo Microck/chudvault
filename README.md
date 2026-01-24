@@ -63,8 +63,8 @@ backend: http://localhost:8080
 
 ## features
 
-- modern ui/ux with shadcn/ui and tailwind
-- **local file storage**: data saved to `frontend/data/db.json` - fully private
+ - modern ui/ux with shadcn/ui and tailwind
+ - **local file storage**: data saved to `frontend/data/db.json` on disk (gitignored)
 - bookmark cards with full text and media
 - tags: create, rename, delete, and mark complete
 - search and filter by text or tag

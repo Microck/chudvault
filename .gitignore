@@ -1,1 +1,32 @@
-data/
+# Local data storage
+frontend/data/
+backend/.env
+
+# Logs
+*.log
+dev.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+backend/bin/
+backend/*.exe
+
+# Temporary files
+*.tmp
+*.temp
+screenshot_verify.js
+homepage_screenshot.png
+
+# Session files
+HANDOFF.md
