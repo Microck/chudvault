@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "ChudVault Saver",
+  "version": "1.0",
+  "description": "Save tweets to ChudVault locally",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://localhost:8080/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://twitter.com/*/status/*", "https://x.com/*/status/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

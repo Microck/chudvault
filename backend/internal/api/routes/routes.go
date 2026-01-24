@@ -3,8 +3,8 @@ package routes
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Microck/chudvault/internal/api/handlers"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -59,6 +59,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		api.POST("/upload", uploadHandler.HandleUpload)
 
 		// Bookmark endpoints
+		api.POST("/bookmarks", bookmarkHandler.Create)
 		api.GET("/bookmarks", bookmarkHandler.List)
 		api.GET("/bookmarks/:id", bookmarkHandler.Get)
 		api.PUT("/bookmarks/:id", bookmarkHandler.Update)

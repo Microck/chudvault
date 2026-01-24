@@ -101,6 +101,10 @@ func min(a, b int) int {
 	return b
 }
 
+func (s *BookmarkService) Create(bookmark *models.Bookmark) error {
+	return s.db.Save(bookmark).Error
+}
+
 func (s *BookmarkService) Get(id string) (*models.Bookmark, error) {
 	var bookmark models.Bookmark
 	if err := s.db.Preload("Media").Preload("Tags").First(&bookmark, "id = ?", id).Error; err != nil {

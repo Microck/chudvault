@@ -5,9 +5,9 @@ import (
 
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Microck/chudvault/internal/models"
 	"github.com/Microck/chudvault/internal/services"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -65,6 +65,21 @@ func (h *BookmarkHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, bookmark)
+}
+
+func (h *BookmarkHandler) Create(c *gin.Context) {
+	var input models.Bookmark
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.Create(&input); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Bookmark created successfully", "bookmark": input})
 }
 
 // Update updates a bookmark's tags
