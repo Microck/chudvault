@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/Pagination';
 import { UploadModal } from '@/components/bookmarks/UploadModal';
-import { SearchAndFilter } from '@/components/bookmarks/SearchAndFilter';
+import { SearchAndFilter, SearchAndFilterRef } from '@/components/bookmarks/SearchAndFilter';
 import { SelectionToolbar } from '@/components/bookmarks/SelectionToolbar';
 import { Statistics } from '@/components/bookmarks/Statistics';
 import { StatisticsRef } from '@/components/bookmarks/Statistics';
@@ -18,6 +18,7 @@ import { Settings, Upload, FileText, Check, Square, Trash2 } from 'lucide-react'
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
 import { AISettingsModal } from '@/components/bookmarks/AISettingsModal';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export default function Home() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
@@ -41,10 +42,56 @@ export default function Home() {
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const reloadTags = useRef<() => void>(() => {});
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const searchAndFilterRef = useRef<SearchAndFilterRef>(null);
   const statisticsRef = useRef<StatisticsRef>(null);
   const mainRef = useRef<HTMLElement>(null);
   const scrollPositionRef = useRef<number>(0);
+
+  const filteredBookmarks = bookmarks
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) ?? [];
+
+  useKeyboardShortcuts({
+    onNext: () => {
+      setFocusedIndex(prev => {
+        const next = Math.min(prev + 1, filteredBookmarks.length - 1);
+        if (next !== prev) {
+          const element = document.getElementById(`bookmark-${filteredBookmarks[next].id}`);
+          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return next;
+      });
+    },
+    onPrevious: () => {
+      setFocusedIndex(prev => {
+        const next = Math.max(prev - 1, 0);
+        if (next !== prev) {
+          const element = document.getElementById(`bookmark-${filteredBookmarks[next].id}`);
+          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return next;
+      });
+    },
+    onArchive: () => {
+      if (focusedIndex >= 0 && focusedIndex < filteredBookmarks.length) {
+        handleArchive(filteredBookmarks[focusedIndex].id);
+      }
+    },
+    onSearch: () => {
+      searchAndFilterRef.current?.focusSearch();
+    },
+    onSelect: () => {
+      if (focusedIndex >= 0 && focusedIndex < filteredBookmarks.length) {
+        if (!isSelectMode) setIsSelectMode(true);
+        handleToggleSelect(filteredBookmarks[focusedIndex].id);
+      }
+    },
+    onDelete: () => {
+      if (selectedBookmarks.size > 0) {
+        setIsDeleteModalOpen(true);
+      }
+    },
+  });
 
   const loadBookmarks = useCallback(async () => {
     setIsLoading(true);
@@ -91,7 +138,7 @@ export default function Home() {
             : bookmark
         )
       );
-      reloadTags.current();
+      searchAndFilterRef.current?.loadTags();
       statisticsRef.current?.refresh();
     } catch (error) {
       console.error('Failed to update tags:', error);
@@ -122,7 +169,7 @@ export default function Home() {
       setSelectedBookmarks(new Set());
       setIsSelectMode(false);
       setIsClearModalOpen(false);
-      reloadTags.current();
+      searchAndFilterRef.current?.loadTags();
       statisticsRef.current?.refresh();
       await loadBookmarks();
     } catch (error) {
@@ -391,15 +438,11 @@ export default function Home() {
 
       <div className="mb-8">
         <SearchAndFilter
+          ref={searchAndFilterRef}
           onSearch={handleSearch}
           onTagSelect={handleTagSelect}
           selectedTag={selectedTag}
           onDeleteTag={handleDeleteTag}
-          ref={(ref: { loadTags: () => void } | null) => {
-            if (ref) {
-              reloadTags.current = ref.loadTags;
-            }
-          }}
         />
       </div>
 
@@ -416,6 +459,7 @@ export default function Home() {
             {filteredBookmarks.map((bookmark, index) => (
               <div 
                 key={bookmark.id} 
+                id={`bookmark-${bookmark.id}`}
                 className="animate-fade-in opacity-0 [animation-fill-mode:forwards]" 
                 style={{ animationDelay: `${index * 50}ms` }}
               >
@@ -428,6 +472,7 @@ export default function Home() {
                   isSelectable={isSelectMode}
                   isSelected={selectedBookmarks.has(bookmark.id)}
                   onToggleSelect={handleToggleSelect}
+                  isFocused={index === focusedIndex}
                 />
               </div>
             ))}

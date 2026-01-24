@@ -39,8 +39,9 @@ export function BookmarkCard({
   isSelected,
   onToggleSelect,
   onArchive,
-  isArchived
-}: BookmarkCardProps) {
+  isArchived,
+  isFocused
+}: BookmarkCardProps & { isFocused?: boolean }) {
   const [newTag, setNewTag] = useState('');
   const [selectedMedia, setSelectedMedia] = useState<null | {
     url: string;
@@ -209,7 +210,7 @@ export function BookmarkCard({
   };
 
   return (
-    <Card className="h-full flex flex-col hover:shadow-lg transition-shadow duration-300 bg-card border-border overflow-hidden group">
+    <Card className={`h-full flex flex-col hover:shadow-lg transition-all duration-200 bg-card border-border overflow-hidden group ${isFocused ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}>
       <CardHeader className="p-4 pb-2 space-y-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">

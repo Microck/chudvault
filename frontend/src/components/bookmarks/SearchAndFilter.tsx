@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { api } from '@/lib/api';
 import { Tag } from '@/types';
 import { TagMenu } from './TagMenu';
@@ -16,6 +16,7 @@ interface SearchAndFilterProps {
 
 export interface SearchAndFilterRef {
   loadTags: () => void;
+  focusSearch: () => void;
 }
 
 export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterProps>(
@@ -23,9 +24,11 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
     const [tags, setTags] = useState<Tag[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [newTagInput, setNewTagInput] = useState('');
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
     useImperativeHandle(ref, () => ({
-      loadTags
+      loadTags,
+      focusSearch: () => searchInputRef.current?.focus()
     }));
 
     useEffect(() => {
@@ -83,6 +86,7 @@ export const SearchAndFilter = forwardRef<SearchAndFilterRef, SearchAndFilterPro
       <div className="mb-8 flex flex-col gap-4">
         <div className="relative w-full">
           <Input
+            ref={searchInputRef}
             type="search"
             placeholder="Search bookmarks..."
             className="w-full pl-11 bg-white dark:bg-[#1e293b] rounded-xl border-2"
