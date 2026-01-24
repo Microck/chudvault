@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { Bookmark } from '@/types';
 import { api } from '@/lib/api';
+import { BookmarkListItem } from '@/components/bookmarks/BookmarkListItem';
 import { BookmarkCard } from '@/components/bookmarks/BookmarkCard';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import { Statistics } from '@/components/bookmarks/Statistics';
 import { StatisticsRef } from '@/components/bookmarks/Statistics';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Settings, Upload, FileText, Check, Square, Trash2 } from 'lucide-react';
+import { Settings, Upload, FileText, Check, Square, Trash2, LayoutGrid, List } from 'lucide-react';
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
 import { AISettingsModal } from '@/components/bookmarks/AISettingsModal';
@@ -42,6 +43,7 @@ export default function Home() {
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const searchAndFilterRef = useRef<SearchAndFilterRef>(null);
   const statisticsRef = useRef<StatisticsRef>(null);
@@ -120,8 +122,15 @@ export default function Home() {
   }, [selectedTag, searchQuery, currentPage, pageSize, showArchived, selectedDate]);
 
   useEffect(() => {
+    const savedViewMode = localStorage.getItem('bookmark-view-mode');
+    if (savedViewMode === 'list') setViewMode('list');
     loadBookmarks();
   }, [loadBookmarks]);
+
+  const toggleViewMode = (mode: 'grid' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('bookmark-view-mode', mode);
+  };
 
   async function handleUpdateTags(id: string, tags: string[]) {
     try {
@@ -346,6 +355,26 @@ export default function Home() {
         <div className="flex flex-wrap items-center gap-3">
           <ThemeToggle />
           <AISettingsModal />
+          <div className="flex bg-muted rounded-md p-1 gap-1">
+            <Button
+              variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => toggleViewMode('grid')}
+              title="Grid View"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => toggleViewMode('list')}
+              title="List View"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
           <Button
             variant={showArchived ? "default" : "secondary"}
             onClick={() => setShowArchived(!showArchived)}
@@ -390,44 +419,6 @@ export default function Home() {
         </div>
       </div>
 
-      {isSettingsModalOpen && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card text-card-foreground border rounded-xl shadow-lg w-full max-w-md p-6 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold">Settings</h3>
-              <Button variant="ghost" size="icon" onClick={() => setIsSettingsModalOpen(false)}>
-                <span className="text-xl">×</span>
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Default Page Size</span>
-                <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                  <SelectTrigger className="w-[100px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[12, 20, 32, 48, 64].map(size => (
-                      <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="font-medium">Theme</span>
-                <ThemeToggle />
-              </div>
-
-              <div className="pt-4 border-t text-sm text-muted-foreground">
-                chudvault v0.1.0
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="mb-8">
         <Statistics 
           ref={statisticsRef}
@@ -455,7 +446,12 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className={cn(
+            "grid gap-6",
+            viewMode === 'grid' 
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+              : "grid-cols-1 max-w-4xl mx-auto"
+          )}>
             {filteredBookmarks.map((bookmark, index) => (
               <div 
                 key={bookmark.id} 
@@ -463,17 +459,31 @@ export default function Home() {
                 className="animate-fade-in opacity-0 [animation-fill-mode:forwards]" 
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <BookmarkCard
-                  bookmark={bookmark}
-                  onUpdateTags={handleUpdateTags}
-                  onDelete={handleDeleteBookmark}
-                  onArchive={handleArchive}
-                  isArchived={bookmark.archived}
-                  isSelectable={isSelectMode}
-                  isSelected={selectedBookmarks.has(bookmark.id)}
-                  onToggleSelect={handleToggleSelect}
-                  isFocused={index === focusedIndex}
-                />
+                {viewMode === 'grid' ? (
+                  <BookmarkCard
+                    bookmark={bookmark}
+                    onUpdateTags={handleUpdateTags}
+                    onDelete={handleDeleteBookmark}
+                    onArchive={handleArchive}
+                    isArchived={bookmark.archived}
+                    isSelectable={isSelectMode}
+                    isSelected={selectedBookmarks.has(bookmark.id)}
+                    onToggleSelect={handleToggleSelect}
+                    isFocused={index === focusedIndex}
+                  />
+                ) : (
+                  <BookmarkListItem
+                    bookmark={bookmark}
+                    onUpdateTags={handleUpdateTags}
+                    onDelete={handleDeleteBookmark}
+                    onArchive={handleArchive}
+                    isArchived={bookmark.archived}
+                    isSelectable={isSelectMode}
+                    isSelected={selectedBookmarks.has(bookmark.id)}
+                    onToggleSelect={handleToggleSelect}
+                    isFocused={index === focusedIndex}
+                  />
+                )}
               </div>
             ))}
           </div>
