@@ -369,7 +369,6 @@ export default function Home() {
       <main ref={mainRef} className="container relative z-10 mx-auto px-6 py-12 max-w-7xl">
         <div className="mb-12 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="chudvault" width={40} height={40} className="h-10 w-10" />
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">chudvault</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
