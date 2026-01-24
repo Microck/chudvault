@@ -475,7 +475,8 @@ export const localStore = {
       items = items.filter((bookmark) =>
         bookmark.full_text.toLowerCase().includes(query) ||
         bookmark.name.toLowerCase().includes(query) ||
-        bookmark.screen_name.toLowerCase().includes(query),
+        bookmark.screen_name.toLowerCase().includes(query) ||
+        bookmark.tags.some((tag) => tag.name.toLowerCase().includes(query))
       );
     }
 
@@ -648,19 +649,6 @@ export const localStore = {
         level: Math.min(4, Math.ceil(count / 2)),
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
-
-    if (debugHeatmap) {
-      const activeDays = heatmapData.filter((d) => d.count > 0).length;
-      const maxCount = heatmapData.reduce((acc, d) => (d.count > acc ? d.count : acc), 0);
-      console.log('[heatmap]', {
-        bookmarks: state.bookmarks.length,
-        days: heatmapData.length,
-        activeDays,
-        maxCount,
-        missingCreatedAt,
-        outOfRange,
-      });
-    }
 
     const topTags = Array.from(tagCounts.entries())
       .map(([name, stats]) => ({ name, ...stats }))

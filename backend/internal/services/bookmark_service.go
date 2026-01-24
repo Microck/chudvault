@@ -206,8 +206,8 @@ func (s *BookmarkService) ListFromView(tag string, search string, page string, l
 
 	// Apply search filter if provided
 	if search != "" {
-		query = query.Where("full_text ILIKE ? OR name ILIKE ? OR screen_name ILIKE ?",
-			"%"+search+"%", "%"+search+"%", "%"+search+"%")
+		query = query.Where("full_text ILIKE ? OR name ILIKE ? OR screen_name ILIKE ? OR tags_json::text ILIKE ?",
+			"%"+search+"%", "%"+search+"%", "%"+search+"%", "%"+search+"%")
 	}
 
 	// Get total count
