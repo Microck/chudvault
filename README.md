@@ -65,7 +65,12 @@ backend: http://localhost:8080
 
  - modern ui/ux with shadcn/ui and tailwind
  - **local file storage**: data saved to `frontend/data/db.json` on disk (gitignored)
-- bookmark cards with full text and media
+ - **AI auto-tagging**: use your own OpenAI/Anthropic keys or local Ollama
+ - **Grid/List view**: customized browsing experience
+ - **Keyboard shortcuts**: `j`/`k` to navigate, `a` to archive, `/` to search
+ - **Data Hygiene**: tools to verify media integrity and find orphans
+ - **Browser Extension**: quick save current tweet (Chrome/Edge)
+ - bookmark cards with full text and media
 - tags: create, rename, delete, and mark complete
 - search and filter by text or tag
 - batch select delete and archive
