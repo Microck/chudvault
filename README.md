@@ -22,6 +22,17 @@
 
 ## quickstart
 
+quickstart (windows):
+```batch
+start.bat
+```
+
+quickstart (mac/linux):
+```bash
+chmod +x start.sh
+./start.sh
+```
+
 local-only:
 
 ```bash
@@ -32,9 +43,9 @@ npm install
 npm run dev
 ```
 
-open: http://localhost:3000
+open: http://localhost:3039
 
-full stack:
+full stack (docker):
 
 ```bash
 git clone https://github.com/Microck/chudvault.git
