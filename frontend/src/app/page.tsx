@@ -18,6 +18,7 @@ import { Settings, Upload, FileText, Check, Square, Trash2, LayoutGrid, List } f
 import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
 import { AISettingsModal } from '@/components/bookmarks/AISettingsModal';
+import { SettingsModal } from '@/components/settings/SettingsModal';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export default function Home() {
@@ -437,6 +438,15 @@ export default function Home() {
           </Button>
         </div>
       </div>
+
+      {isSettingsModalOpen && (
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+        />
+      )}
 
       <div className="mb-8">
         <Statistics 
