@@ -22,16 +22,19 @@
 
 ## quickstart
 
-quickstart (windows):
-```batch
-start.bat
-```
-
-quickstart (mac/linux):
+quickstart:
 ```bash
+# Windows
+start.bat
+
+# Mac/Linux
 chmod +x start.sh
 ./start.sh
 ```
+
+choose mode:
+1. **Local-only** - frontend only, data saved to file
+2. **Full-stack** - frontend + backend + Docker (PostgreSQL)
 
 local-only:
 

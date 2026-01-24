@@ -1,44 +1,43 @@
 @echo off
-echo Starting ChudVault...
+echo ========================================
+echo ChudVault Quickstart
+echo ========================================
 echo.
+echo Choose mode:
+echo   1. Local-only (frontend only, no DB needed)
+echo   2. Full-stack (frontend + backend + Docker)
+echo.
+set /p choice="Enter choice (1 or 2): "
 
-REM Check if .env exists for backend
-IF NOT EXIST "backend\.env" (
-    echo Creating backend .env file...
-    (
-        echo DB_HOST=localhost
-        echo DB_PORT=5432
-        echo DB_USER=postgres
-        echo DB_PASSWORD=postgres
-        echo DB_NAME=chudvault
-        echo SERVER_PORT=8080
-    ) > backend\.env
-    echo Created backend\.env
-    echo.
-)
+if "%choice%"=="1" goto local
+if "%choice%"=="2" goto fullstack
+echo Invalid choice. Exiting.
+exit /b 1
 
-REM Start frontend in new window
-echo Starting frontend on http://localhost:3039...
+:local
+echo.
+echo Starting local-only mode...
+echo No database needed - data saved to frontend/data/db.json
+echo.
 start "ChudVault Frontend" cmd /k "cd /d %~dp0frontend && npm install && npm run dev"
-
-REM Wait a bit for frontend to start
-timeout /t 3 /nobreak > nul
-
-REM Start backend in new window
-echo Starting backend on http://localhost:8080...
-start "ChudVault Backend" cmd /k "cd /d %~dp0backend && go mod tidy && go run cmd/server/main.go"
-
+timeout /t 2 /nobreak > nul
 echo.
 echo ========================================
-echo ChudVault started!
+echo Local mode started!
 echo Frontend: http://localhost:3039
-echo Backend:  http://localhost:8080
 echo ========================================
 echo.
-echo Press any key to stop all services...
+echo Press any key to stop...
 pause > nul
-
-echo Stopping services...
 taskkill /FI "WINDOWTITLE eq ChudVault Frontend*" /T > nul 2>&1
-taskkill /FI "WINDOWTITLE eq ChudVault Backend*" /T > nul 2>&1
-echo Done.
+goto end
+
+:fullstack
+echo.
+echo Starting full-stack mode with Docker...
+echo This will start PostgreSQL, backend, and frontend
+echo.
+docker compose up --build
+goto end
+
+:end
