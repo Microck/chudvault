@@ -5,7 +5,6 @@ import { Bookmark } from '@/types';
 import { api } from '@/lib/api';
 import { BookmarkListItem } from '@/components/bookmarks/BookmarkListItem';
 import { BookmarkCard } from '@/components/bookmarks/BookmarkCard';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { UploadModal } from '@/components/bookmarks/UploadModal';
 import { SearchAndFilter, SearchAndFilterRef } from '@/components/bookmarks/SearchAndFilter';

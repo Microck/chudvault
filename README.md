@@ -84,12 +84,12 @@ backend: http://localhost:8080
 ## how it works
 
 ```mermaid
-flowchart td
-  a[export twitter bookmarks json + zip] --> b[upload in ui]
-  b --> c{local mode?}
-  c -->|yes| d[local api writes to data/db.json]
-  c -->|no| e[backend parses and stores in postgres]
-  d --> f[frontend renders cards, tags, stats]
+flowchart TD
+  a["export twitter bookmarks json + zip"] --> b["upload in ui"]
+  b --> c{"local mode?"}
+  c -->|yes| d["local api writes to data/db.json"]
+  c -->|no| e["backend parses and stores in postgres"]
+  d --> f["frontend renders cards, tags, stats"]
   e --> f
 ```
 
