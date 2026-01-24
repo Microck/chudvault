@@ -7,7 +7,6 @@ import { BookmarkListItem } from '@/components/bookmarks/BookmarkListItem';
 import { BookmarkCard } from '@/components/bookmarks/BookmarkCard';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/Pagination';
 import { UploadModal } from '@/components/bookmarks/UploadModal';
 import { SearchAndFilter, SearchAndFilterRef } from '@/components/bookmarks/SearchAndFilter';
 import { SelectionToolbar } from '@/components/bookmarks/SelectionToolbar';
@@ -49,6 +48,24 @@ export default function Home() {
   const statisticsRef = useRef<StatisticsRef>(null);
   const mainRef = useRef<HTMLElement>(null);
   const scrollPositionRef = useRef<number>(0);
+  const observerTarget = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && currentPage < totalPages && !isLoading) {
+          loadBookmarks(currentPage + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [currentPage, totalPages, isLoading, loadBookmarks]);
 
   const filteredBookmarks = bookmarks
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) ?? [];
@@ -95,36 +112,38 @@ export default function Home() {
     },
   });
 
-  const loadBookmarks = useCallback(async () => {
+  const loadBookmarks = useCallback(async (pageToLoad = 1) => {
     setIsLoading(true);
-    scrollPositionRef.current = window.scrollY;
+    if (pageToLoad === 1) {
+        scrollPositionRef.current = window.scrollY;
+    }
 
     try {
       const data = await api.getBookmarks({
         tag: selectedTag,
         search: searchQuery,
-        page: currentPage,
+        page: pageToLoad,
         limit: pageSize,
         archived: showArchived,
         date: selectedDate,
       });
 
-      setBookmarks(data.bookmarks || []);
+      setBookmarks(prev => pageToLoad === 1 ? (data.bookmarks || []) : [...prev, ...(data.bookmarks || [])]);
       setTotalPages(Math.ceil(data.total / pageSize));
-      if (mainRef.current) {
+      setCurrentPage(pageToLoad);
+      
+      if (pageToLoad === 1 && mainRef.current) {
         window.scrollTo(0, scrollPositionRef.current);
       }
     } catch (error) {
       console.error('Failed to load bookmarks:', error);
-      setBookmarks([]);
+      if (pageToLoad === 1) setBookmarks([]);
     }
     setIsLoading(false);
-  }, [selectedTag, searchQuery, currentPage, pageSize, showArchived, selectedDate]);
+  }, [selectedTag, searchQuery, pageSize, showArchived, selectedDate]);
 
   useEffect(() => {
-    const savedViewMode = localStorage.getItem('bookmark-view-mode');
-    if (savedViewMode === 'list') setViewMode('list');
-    loadBookmarks();
+    loadBookmarks(1);
   }, [loadBookmarks]);
 
   const toggleViewMode = (mode: 'grid' | 'list') => {
@@ -495,13 +514,11 @@ export default function Home() {
           )}
 
           {filteredBookmarks.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              pageSize={pageSize}
-              onPageSizeChange={(size) => handlePageSizeChange(size.toString())}
-            />
+            <div ref={observerTarget} className="h-20 w-full flex items-center justify-center p-4">
+              {isLoading && currentPage > 1 && (
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              )}
+            </div>
           )}
         </>
       )}
