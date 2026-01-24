@@ -12,19 +12,21 @@ interface UploadModalProps {
 }
 
 export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
-  const [jsonFile, setJsonFile] = useState<File | null>(null);
+  const [jsonFiles, setJsonFiles] = useState<File[]>([]);
   const [zipFile, setZipFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!jsonFile || !zipFile) return;
+    if (jsonFiles.length === 0) return;
 
     setIsUploading(true);
     try {
-      await api.uploadBookmarks(jsonFile, zipFile);
+      await api.uploadBookmarks(jsonFiles[0], zipFile);
       onSuccess();
       onClose();
+      setJsonFiles([]);
+      setZipFile(null);
     } catch (error) {
       console.error('Upload failed:', error);
     }
@@ -39,24 +41,30 @@ export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="json-file">JSON File</Label>
+            <Label htmlFor="json-file">JSON File(s)</Label>
             <Input
               id="json-file"
               type="file"
               accept=".json"
-              onChange={(e) => setJsonFile(e.target.files?.[0] || null)}
+              multiple
+              onChange={(e) => setJsonFiles(Array.from(e.target.files || []))}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Select one or more Twitter bookmark export files
+            </p>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="zip-file">ZIP File</Label>
+            <Label htmlFor="zip-file">ZIP File (optional)</Label>
             <Input
               id="zip-file"
               type="file"
               accept=".zip"
               onChange={(e) => setZipFile(e.target.files?.[0] || null)}
-              required
             />
+            <p className="text-xs text-muted-foreground">
+              Media files from Twitter exporter. If not provided, will fetch from URLs
+            </p>
           </div>
           <DialogFooter>
             <Button

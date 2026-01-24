@@ -14,8 +14,8 @@ import (
 
 	"errors"
 
-	"github.com/gin-gonic/gin"
 	"github.com/Microck/chudvault/internal/models"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -66,12 +66,9 @@ func (h *UploadHandler) HandleUpload(c *gin.Context) {
 		return
 	}
 
-	// Get the ZIP file
-	zipFile, err := c.FormFile("zipFile")
-	if err != nil {
-		fmt.Printf("Error getting ZIP file: %v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "No ZIP file provided"})
-		return
+	var zipFile *multipart.FileHeader
+	if f, _ := c.FormFile("zipFile"); f != nil {
+		zipFile = f
 	}
 
 	// Process JSON file
@@ -85,11 +82,30 @@ func (h *UploadHandler) HandleUpload(c *gin.Context) {
 	// Begin transaction
 	tx := h.db.Begin()
 
-	// Process each bookmark
+	importedCount := 0
+	duplicateCount := 0
+
 	for i, bookmark := range bookmarks {
-		// Create or update bookmark
-		if err := h.processBookmark(tx, bookmark, zipFile); err != nil {
-			fmt.Printf("Error processing bookmark %d: %v\n", i, err)
+		var existingBookmark models.Bookmark
+		err := tx.Where("id = ?", bookmark.ID).First(&existingBookmark).Error
+
+		if err == nil {
+			duplicateCount++
+			if err := h.processBookmark(tx, bookmark, zipFile); err != nil {
+				fmt.Printf("Error processing bookmark %d: %v\n", i, err)
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		} else if errors.Is(err, gorm.ErrRecordNotFound) {
+			importedCount++
+			if err := h.processBookmark(tx, bookmark, zipFile); err != nil {
+				fmt.Printf("Error processing bookmark %d: %v\n", i, err)
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+		} else {
 			tx.Rollback()
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -104,8 +120,10 @@ func (h *UploadHandler) HandleUpload(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Upload processed successfully",
-		"count":   len(bookmarks),
+		"message":    "Upload processed successfully",
+		"imported":   importedCount,
+		"duplicates": duplicateCount,
+		"total":      len(bookmarks),
 	})
 }
 
@@ -165,7 +183,7 @@ func (h *UploadHandler) processBookmark(tx *gorm.DB, tb TwitterBookmark, zipFile
 			Logger: tx.Logger.LogMode(logger.Silent),
 		}).Where("tweet_id = ? AND file_name = ?", tb.ID, mediaFileName).
 			First(&existingMedia).Error
-		
+
 		if err == nil {
 			// Media already exists, skip creating a new one
 			continue

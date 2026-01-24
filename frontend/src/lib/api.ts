@@ -78,13 +78,15 @@ export const api = {
     return res.json();
   },
 
-  async uploadBookmarks(jsonFile: File, zipFile: File) {
+  async uploadBookmarks(jsonFile: File, zipFile: File | null) {
     if (LOCAL_MODE) {
       return localStore.importBookmarks(jsonFile, zipFile);
     }
     const formData = new FormData();
     formData.append('jsonFile', jsonFile);
-    formData.append('zipFile', zipFile);
+    if (zipFile) {
+      formData.append('zipFile', zipFile);
+    }
 
     const res = await fetch(`${API_BASE_URL}/upload`, {
       method: 'POST',

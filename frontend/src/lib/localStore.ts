@@ -247,14 +247,45 @@ function lookupFile(files: Record<string, Uint8Array>, fileName: string) {
   return file ?? null;
 }
 
-function toMedia(bookmark: TwitterBookmark, fileMap: Record<string, Uint8Array>): StoredMedia[] {
+function getVxTwitterUrl(url: string): string | null {
+  const match = url.match(/https?:\/\/(?:www\.)?(?:twitter|x)\.com\/[^\/]+\/status\/\d+/);
+  if (!match) return null;
+  return url.replace(/(?:twitter|x)\.com/, 'vxtwitter.com');
+}
+
+async function fetchMedia(url: string): Promise<Blob | null> {
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) return null;
+    return await response.blob();
+  } catch (error) {
+    console.warn('Failed to fetch media:', url, error);
+    return null;
+  }
+}
+
+async function toMedia(bookmark: TwitterBookmark, fileMap: Record<string, Uint8Array>): Promise<StoredMedia[]> {
   if (!bookmark.media || bookmark.media.length === 0) return [];
 
-  return bookmark.media.map((media, index) => {
+  const promises = bookmark.media.map(async (media, index) => {
     const fileName = resolveMediaFileName(bookmark.screen_name, bookmark.id, media.type, index + 1);
     const data = lookupFile(fileMap, fileName);
-    const blob = data ? new Blob([data.slice().buffer], { type: media.type === 'video' ? 'video/mp4' : 'image/jpeg' }) : null;
-    const url = blob ? URL.createObjectURL(blob) : media.url;
+    let blob: Blob | null = null;
+    let url = media.url;
+
+    if (data) {
+      blob = new Blob([data.slice().buffer], { type: media.type === 'video' ? 'video/mp4' : 'image/jpeg' });
+      url = URL.createObjectURL(blob);
+    } else {
+      const vxUrl = getVxTwitterUrl(bookmark.url);
+      if (vxUrl) {
+        blob = await fetchMedia(vxUrl);
+        if (blob) {
+          url = URL.createObjectURL(blob);
+        }
+      }
+    }
+
     const thumbnail = blob && media.type === 'image' ? url : media.thumbnail;
     const original = blob ? url : media.original;
 
@@ -269,11 +300,13 @@ function toMedia(bookmark: TwitterBookmark, fileMap: Record<string, Uint8Array>)
       blob,
     };
   });
+
+  return Promise.all(promises);
 }
 
-function mapBookmarks(raw: TwitterBookmark[], fileMap: Record<string, Uint8Array>): StoredBookmark[] {
-  return raw.map((bookmark) => {
-    const media = toMedia(bookmark, fileMap);
+async function mapBookmarks(raw: TwitterBookmark[], fileMap: Record<string, Uint8Array>): Promise<StoredBookmark[]> {
+  return Promise.all(raw.map(async (bookmark) => {
+    const media = await toMedia(bookmark, fileMap);
     return {
       id: bookmark.id,
       created_at: new Date(bookmark.created_at).toISOString(),
@@ -292,7 +325,7 @@ function mapBookmarks(raw: TwitterBookmark[], fileMap: Record<string, Uint8Array
       tags: [],
       archived: false,
     };
-  });
+  }));
 }
 
 function mapTagsFromBookmarks(bookmarks: StoredBookmark[], tags: StoredTag[]) {
@@ -395,20 +428,26 @@ export const localStore = {
     return { message: 'Cleared all data' };
   },
 
-  async importBookmarks(jsonFile: File, zipFile: File) {
-    const [rawBookmarks, fileMap] = await Promise.all([
-      readJsonFile(jsonFile),
-      unzipMedia(zipFile),
-    ]);
+  async importBookmarks(jsonFile: File, zipFile: File | null) {
+    const rawBookmarks = await readJsonFile(jsonFile);
+    const fileMap = zipFile ? await unzipMedia(zipFile) : {};
 
     const state = await readState();
-    const bookmarks = mapBookmarks(rawBookmarks, fileMap);
+    const newBookmarks = await mapBookmarks(rawBookmarks, fileMap);
+
+    const existingIds = new Set(state.bookmarks.map((b) => b.id));
+    const uniqueNewBookmarks = newBookmarks.filter((b) => !existingIds.has(b.id));
+
     refreshTagList(state);
 
-    state.bookmarks = bookmarks;
+    state.bookmarks = [...state.bookmarks, ...uniqueNewBookmarks];
     await writeState(state);
 
-    return { count: bookmarks.length };
+    return {
+      imported: uniqueNewBookmarks.length,
+      duplicates: newBookmarks.length - uniqueNewBookmarks.length,
+      total: state.bookmarks.length,
+    };
   },
 
   async listBookmarks(params?: {
