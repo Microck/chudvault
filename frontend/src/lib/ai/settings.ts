@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type AIProvider = 'openai' | 'anthropic' | 'ollama';
+export type AIProvider = 'openai' | 'anthropic' | 'ollama' | 'gemini';
 
 export interface AISettings {
   provider: AIProvider;
