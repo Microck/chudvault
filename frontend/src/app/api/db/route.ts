@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
+import { Mutex } from 'async-mutex';
 
 const DB_PATH = path.join(process.cwd(), 'data', 'db.json');
+const mutex = new Mutex();
 
 async function retry<T>(operation: () => Promise<T>, retries = 5, delay = 50): Promise<T> {
   for (let i = 0; i < retries; i++) {
@@ -48,13 +50,15 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    await ensureDb();
-    await retry(() => fs.writeFile(DB_PATH, JSON.stringify(body, null, 2)));
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('API POST Error:', error);
-    return NextResponse.json({ error: 'Failed to write DB' }, { status: 500 });
-  }
+  return await mutex.runExclusive(async () => {
+    try {
+      const body = await request.json();
+      await ensureDb();
+      await retry(() => fs.writeFile(DB_PATH, JSON.stringify(body, null, 2)));
+      return NextResponse.json({ success: true });
+    } catch (error) {
+      console.error('API POST Error:', error);
+      return NextResponse.json({ error: 'Failed to write DB' }, { status: 500 });
+    }
+  });
 }

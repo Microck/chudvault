@@ -233,7 +233,17 @@ async function readFileArrayBuffer(file: File): Promise<ArrayBuffer> {
 
 async function readJsonFile(file: File): Promise<TwitterBookmark[]> {
   const text = await readFileText(file);
-  return JSON.parse(text) as TwitterBookmark[];
+  const data = JSON.parse(text);
+  
+  if (Array.isArray(data)) {
+    return data as TwitterBookmark[];
+  }
+  
+  if (data && Array.isArray(data.bookmarks)) {
+    return data.bookmarks as TwitterBookmark[];
+  }
+
+  throw new Error('Invalid JSON format: Expected array or object with "bookmarks" array');
 }
 
 async function unzipMedia(zipFile: File): Promise<Record<string, Uint8Array>> {
