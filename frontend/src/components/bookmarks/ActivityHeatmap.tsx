@@ -32,8 +32,8 @@ export function ActivityHeatmap({ data, onDateSelect, selectedDate }: ActivityHe
       <ActivityCalendar
         data={data}
         theme={{
-          light: ['#e2e8f0', '#5eead4', '#2dd4bf', '#14b8a6', '#0f766e'],
-          dark: ['#1e293b', '#134e4a', '#0f766e', '#14b8a6', '#2dd4bf'],
+          light: ['#e2e8f0', '#99f6e4', '#5eead4', '#2dd4bf', '#14b8a6'],
+          dark: ['#1e293b', '#134e4a', '#115e59', '#0f766e', '#0d9488'],
         }}
         colorScheme={theme === 'dark' ? 'dark' : 'light'}
         blockSize={12}
