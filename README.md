@@ -15,7 +15,7 @@
 
 
  <p align="center">
-   <img src="./docs/assets/preview.png" width="800" alt="chudvault preview" />
+   <img src="https://github.com/user-attachments/assets/a0aa7aa0-240f-421a-9755-3e41f2d61f8f" width="800" alt="chudvault preview" />
  </p>
 
 ---
