@@ -35,6 +35,7 @@ export function AISettingsModal() {
               <SelectContent>
                 <SelectItem value="openai">OpenAI</SelectItem>
                 <SelectItem value="anthropic">Anthropic</SelectItem>
+                <SelectItem value="gemini">Google Gemini</SelectItem>
                 <SelectItem value="ollama">Ollama (Local)</SelectItem>
               </SelectContent>
             </Select>
@@ -60,6 +61,7 @@ export function AISettingsModal() {
               placeholder={
                 settings.provider === 'openai' ? 'gpt-4o-mini' :
                 settings.provider === 'anthropic' ? 'claude-3-haiku-20240307' :
+                settings.provider === 'gemini' ? 'gemini-1.5-flash' :
                 'llama3'
               }
             />

@@ -26,6 +26,8 @@ export async function generateTags(
     return callAnthropic(prompt, settings);
   } else if (settings.provider === 'ollama') {
     return callOllama(prompt, settings);
+  } else if (settings.provider === 'gemini') {
+    return callGemini(prompt, settings);
   }
 
   throw new Error('Unsupported provider');
@@ -39,7 +41,7 @@ async function callOpenAI(prompt: string, settings: AISettings): Promise<TagSugg
       'Authorization': `Bearer ${settings.apiKey}`,
     },
     body: JSON.stringify({
-      model: settings.model,
+      model: settings.model || 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
     }),
@@ -60,7 +62,7 @@ async function callAnthropic(prompt: string, settings: AISettings): Promise<TagS
       'dangerously-allow-browser': 'true', 
     },
     body: JSON.stringify({
-      model: settings.model,
+      model: settings.model || 'claude-3-haiku-20240307',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -85,7 +87,7 @@ async function callOllama(prompt: string, settings: AISettings): Promise<TagSugg
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: settings.model,
+      model: settings.model || 'llama3',
       prompt: prompt + " Respond with JSON only.",
       stream: false,
       format: 'json',
@@ -95,4 +97,33 @@ async function callOllama(prompt: string, settings: AISettings): Promise<TagSugg
   if (!res.ok) throw new Error(`Ollama Error: ${res.statusText}`);
   const data = await res.json();
   return JSON.parse(data.response);
+}
+
+async function callGemini(prompt: string, settings: AISettings): Promise<TagSuggestion> {
+  const model = settings.model || 'gemini-1.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${settings.apiKey}`;
+  
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{
+        parts: [{ text: prompt + " Respond with valid JSON only, no markdown formatting." }]
+      }]
+    })
+  });
+
+  if (!res.ok) throw new Error(`Gemini Error: ${res.statusText}`);
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  
+  if (!text) return { tags: [] };
+
+  try {
+    const cleanText = text.replace(/```json\n?|\n?```/g, '').trim();
+    return JSON.parse(cleanText);
+  } catch (e) {
+    console.warn('Failed to parse Gemini JSON', text);
+    return { tags: [] };
+  }
 }
