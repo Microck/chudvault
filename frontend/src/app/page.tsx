@@ -65,7 +65,7 @@ export default function Home() {
     }
 
     return () => observer.disconnect();
-  }, [currentPage, totalPages, isLoading, loadBookmarks]);
+  }, [currentPage, totalPages, isLoading]);
 
   useKeyboardShortcuts({
     onNext: () => {
