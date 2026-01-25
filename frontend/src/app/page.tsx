@@ -67,9 +67,6 @@ export default function Home() {
     return () => observer.disconnect();
   }, [currentPage, totalPages, isLoading, loadBookmarks]);
 
-  const filteredBookmarks = bookmarks
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) ?? [];
-
   useKeyboardShortcuts({
     onNext: () => {
       setFocusedIndex(prev => {
