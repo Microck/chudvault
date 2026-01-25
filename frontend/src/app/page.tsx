@@ -18,6 +18,7 @@ import { DotPattern } from '@/components/ui/dot-pattern';
 import { cn } from '@/lib/utils';
 import { AISettingsModal } from '@/components/bookmarks/AISettingsModal';
 import { SettingsModal } from '@/components/settings/SettingsModal';
+import { ManualTaggingModal } from '@/components/bookmarks/ManualTaggingModal';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export default function Home() {
@@ -41,6 +42,7 @@ export default function Home() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isManualTaggingOpen, setIsManualTaggingOpen] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [focusedIndex, setFocusedIndex] = useState(-1);
@@ -370,6 +372,14 @@ export default function Home() {
         <div className="flex flex-wrap items-center gap-3">
           <ThemeToggle />
           <AISettingsModal />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setIsManualTaggingOpen(true)}
+            title="Manual AI Tagging (Export/Import)"
+          >
+            Manual AI
+          </Button>
           <div className="flex bg-muted rounded-md p-1 gap-1">
             <Button
               variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
@@ -533,6 +543,16 @@ export default function Home() {
         onClose={() => setIsUploadModalOpen(false)}
         onSuccess={() => {
           setCurrentPage(1);
+          loadBookmarks();
+        }}
+      />
+
+      <ManualTaggingModal
+        isOpen={isManualTaggingOpen}
+        onClose={() => setIsManualTaggingOpen(false)}
+        onSuccess={() => {
+          searchAndFilterRef.current?.loadTags();
+          statisticsRef.current?.refresh();
           loadBookmarks();
         }}
       />

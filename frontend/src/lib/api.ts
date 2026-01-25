@@ -203,6 +203,16 @@ export const api = {
     return new Blob([data], { type: 'text/markdown' });
   },
 
+  async exportBookmarksForAI(): Promise<Blob> {
+    if (LOCAL_MODE) {
+      const data = await localStore.listBookmarks({ page: 1, limit: Number.MAX_SAFE_INTEGER, archived: false });
+      const simplified = data.bookmarks.map(b => ({ id: b.id, text: b.full_text }));
+      const payload = JSON.stringify(simplified, null, 2);
+      return new Blob([payload], { type: 'application/json' });
+    }
+    throw new Error('Not implemented for full stack mode yet');
+  },
+
   async clearAll() {
     if (LOCAL_MODE) {
       return localStore.clearAll();
